@@ -17,13 +17,13 @@ const int secretKnockAverageThreshold = 15;    // the maximum average knock vari
 // variables
 int sensorReading;
 int knockValue;
-int knockTime;
-int lastKnock;
+unsigned long knockTime;
+unsigned long lastKnock;
 boolean knocking;
 boolean knocked;
 
 int knockIndex = 0;
-int knockTimings[maxKnocks];
+unsigned long knockTimings[maxKnocks];
 
 int r = 0, g = 0, b = 0;
 
@@ -52,7 +52,11 @@ void processKnocks()
 {
   knocking = false;
   int numKnocks = knockIndex + 1;
+  
+  // reset values
   knockIndex = 0;
+  lastKnock = millis();
+  knockValue = 0;
   
   // TODO: process knock timings to determine pattern
   if(numKnocks >= 2)
@@ -95,7 +99,11 @@ void processKnocks()
   }
   else
   {
-    Serial.println("Not Enough Knocks");
+    Serial.print("Not Enough Knocks (");
+    Serial.print(knocking);
+    Serial.print(", ");
+    Serial.print(millis() - lastKnock);
+    Serial.println(")");
     fadeToColor(0,0,255);
   }
 }
@@ -130,6 +138,7 @@ void loop()
     if(sensorReading < knockLowThreshold)
     {
       knocked = false;
+      knockValue = 0;
       digitalWrite(led, LOW);
     }
   }
