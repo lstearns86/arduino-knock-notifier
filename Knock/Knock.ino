@@ -13,6 +13,7 @@ const int maxKnocks = 20;           // maximum number of knocks in pattern
 
 const int secretKnockIndividualThreshold = 25; // the maximum amount that an individual knock timing (normalized) can be off before rejection
 const int secretKnockAverageThreshold = 15;    // the maximum average knock variation from secret knock before rejection
+const int ledFadeDelay = 2000;                 // the duration to display the rbg led color before fading out
 
 // variables
 int sensorReading;
@@ -21,6 +22,7 @@ unsigned long knockTime;
 unsigned long lastKnock;
 boolean knocking;
 boolean knocked;
+unsigned long ledTime;
 
 int knockIndex = 0;
 unsigned long knockTimings[maxKnocks];
@@ -124,14 +126,19 @@ void fadeToColor(int r2, int g2, int b2)
     
     delay(10);
   }
+  analogWrite(red, 255 - r2);
+  analogWrite(green, 255 - g2);
+  analogWrite(blue, 255 - b2);
   r = r2;
   g = g2;
-  b = b2;  
+  b = b2;
+  ledTime = millis();
 }
 
 void loop()
 {
   sensorReading = analogRead(knockSensor);
+  if((r > 0 || g > 0 || b > 0) && millis() - ledTime > ledFadeDelay) fadeToColor(0, 0, 0);
   
   if(knocked)
   {
